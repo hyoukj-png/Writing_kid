@@ -1,6 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:writing_kid/features/theme/presentation/theme_selection_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,50 +24,17 @@ class EcoHeroApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
-        textTheme: GoogleFonts.juaTextTheme(), // 아이들에게 친숙한 폰트 적용
+        textTheme: GoogleFonts.juaTextTheme(),
       ),
-      home: const PlaceholderScreen(),
-    );
-  }
-}
-
-class PlaceholderScreen extends StatelessWidget {
-  const PlaceholderScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.greenAccent, Colors.blueAccent],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.eco, size: 100, color: Colors.white),
-              const SizedBox(height: 20),
-              Text(
-                '에코 히어로 한글 특공대',
-                style: GoogleFonts.jua(
-                  fontSize: 32,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                '환경을 구하는 한글 공부 여행!',
-                style: TextStyle(fontSize: 18, color: Colors.white70),
-              ),
-            ],
-          ),
-        ),
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        dragDevices: {
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.touch,
+          PointerDeviceKind.stylus,
+          PointerDeviceKind.unknown,
+        },
       ),
+      home: const ThemeSelectionScreen(),
     );
   }
 }

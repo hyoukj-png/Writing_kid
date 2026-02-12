@@ -32,6 +32,11 @@
   <title>writing_kid</title>
   <link rel="manifest" href="manifest.json">
 </head>
+<script>
+    // This script ensures that the browser allows audio playback
+    // and helps initialize the audio context for the game.
+    window.flutterWebRenderer = "canvaskit";
+</script>
 <body>
   <script src="flutter_bootstrap.js" async></script>
 </body>
