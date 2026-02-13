@@ -4,11 +4,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:writing_kid/features/theme/presentation/theme_selection_screen.dart';
 
-void main() {
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:writing_kid/core/storage/storage_service.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // 로컬 저장소 초기화
+  final prefs = await SharedPreferences.getInstance();
+
   runApp(
-    const ProviderScope(
-      child: EcoHeroApp(),
+    ProviderScope(
+      overrides: [
+        // 여기서 초기화된 prefs를 주입
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const EcoHeroApp(),
     ),
   );
 }

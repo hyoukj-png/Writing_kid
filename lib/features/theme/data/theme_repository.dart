@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:writing_kid/core/storage/storage_service.dart';
 import 'package:writing_kid/features/theme/domain/theme_model.dart';
 
 part 'theme_repository.g.dart';
@@ -9,15 +10,33 @@ part 'theme_repository.g.dart';
 class ThemeRepository extends _$ThemeRepository {
   @override
   List<ThemeModel> build() {
-    return _initialThemes;
+    // 1. 초기 데이터 로드
+    List<ThemeModel> themes = _initialThemes;
+
+    try {
+      // 2. 저장된 해금 데이터 반영
+      // StorageService는 ProviderScope에서 override되었으므로 watch 가능
+      final storage = ref.watch(storageServiceProvider);
+      final unlockedIds = storage.loadUnlockedThemes();
+
+      themes = themes.map((theme) {
+        if (unlockedIds.contains(theme.id)) {
+          return theme.copyWith(isUnlocked: true);
+        }
+        return theme;
+      }).toList();
+    } catch (e) {
+      print('Error loading theme data: $e');
+    }
+
+    return themes;
   }
 
   // 오염도 감소 로직
-  // 1회 성공 시 오염도 20% 감소 (5번 성공하면 완치)
-  void decreasePollution(String id) {
+  void decreasePollution(String id, int amount) {
     state = state.map((theme) {
       if (theme.id == id) {
-        int newLevel = (theme.pollutionLevel - 20).clamp(0, 100);
+        int newLevel = (theme.pollutionLevel - amount).clamp(0, 100);
         return theme.copyWith(pollutionLevel: newLevel);
       }
       return theme;
@@ -32,6 +51,11 @@ class ThemeRepository extends _$ThemeRepository {
       }
       return theme;
     }).toList();
+
+    // 저장소에 업데이트
+    final storage = ref.read(storageServiceProvider);
+    final unlockedIds = state.where((t) => t.isUnlocked).map((t) => t.id).toList();
+    storage.saveUnlockedThemes(unlockedIds);
   }
 
   // 초기 8개 테마 데이터 정의
